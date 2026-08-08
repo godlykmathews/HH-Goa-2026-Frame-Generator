@@ -1,0 +1,14 @@
+<svg width="600" height="210" viewBox="0 0 600 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>HH Goa 2026 placeholder wordmark</title>
+  <rect width="600" height="210" rx="24" fill="#006B3C"/>
+  <path d="M0 18H600M0 192H600" stroke="#FEE101" stroke-width="6"/>
+  <path d="M0 28H600M0 182H600" stroke="#FF1684" stroke-width="3" stroke-dasharray="8 7"/>
+  <g fill="#FEE101">
+    <path d="M42 52H74V90H112V52H144V158H112V116H74V158H42V52Z"/>
+    <path d="M162 52H194V90H232V52H264V158H232V116H194V158H162V52Z"/>
+  </g>
+  <text x="296" y="104" fill="#FEE101" font-family="Arial Black,Arial,sans-serif" font-size="58" font-weight="900" letter-spacing="2">GOA</text>
+  <text x="300" y="149" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="800" letter-spacing="12">2026</text>
+  <circle cx="548" cy="72" r="19" fill="#FF1684"/>
+  <path d="M531 72H565M548 55V89" stroke="#FEE101" stroke-width="5"/>
+</svg>

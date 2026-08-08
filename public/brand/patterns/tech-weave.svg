@@ -1,0 +1,14 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>HH Goa technical weave pattern</title>
+  <g stroke="#FEE101" stroke-opacity=".16" stroke-width="2">
+    <path d="M0 40H72L94 62H164L188 38H252L278 64H320"/>
+    <path d="M0 160H44L70 134H142L170 162H236L260 138H320"/>
+    <path d="M0 278H60L84 254H152L178 280H252L276 256H320"/>
+    <path d="M40 0V68L62 90V158L38 184V252L64 278V320"/>
+    <path d="M160 0V44L134 70V142L162 170V236L138 260V320"/>
+    <path d="M278 0V60L254 84V152L280 178V252L256 276V320"/>
+  </g>
+  <g fill="#FF1684" fill-opacity=".34">
+    <circle cx="94" cy="62" r="5"/><circle cx="170" cy="162" r="5"/><circle cx="254" cy="84" r="5"/><circle cx="84" cy="254" r="5"/>
+  </g>
+</svg>
