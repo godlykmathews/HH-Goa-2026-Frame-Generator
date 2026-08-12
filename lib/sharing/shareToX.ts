@@ -30,7 +30,7 @@ export function buildXShareCaption(options: ShareToXOptions): string {
   const shareUrl = requirePublicUrl(options.shareUrl);
 
   return [
-    "I'm ready build at HH Goa 2026 🌴⚡",
+    "I'm ready to build at HH Goa 2026 🌴⚡",
     "",
     "Apparently I'm:",
     `"${cleanBuilderTitle(options.builderTitle)}"`,
