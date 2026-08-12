@@ -3,7 +3,7 @@
 Local creation, editing, rendering, and downloading do not contact Supabase.
 The original upload is never passed to the sharing layer. A public upload starts
 only when the user explicitly chooses an action that needs a public URL (X or a
-link-based fallback) and the UI passes the finished 1080 × 1350 PNG/JPEG Blob to
+link-based fallback) and the UI passes the finished 850 × 1350 PNG/JPEG Blob to
 `uploadGeneratedFrame`.
 
 ## Setup

@@ -1,13 +1,13 @@
 # HH Goa 2026 Frame Generator
 
-A mobile-first, no-account campaign tool for creating 1080 × 1350 Hacker House Goa builder graphics in one pass. The uploaded source photo stays in the browser. The app only publishes the finished card when the user explicitly chooses a public-link sharing action.
+A mobile-first, no-account campaign tool for creating 850 × 1350 Hacker House Goa builder credentials in one pass. The uploaded source photo stays in the browser. The app only publishes the finished card when the user explicitly chooses a public-link sharing action.
 
 ## What is included
 
 - JPG, PNG, WEBP, HEIC, and HEIF input with lazy, client-side HEIC conversion
 - cover crop with drag, keyboard nudging, mouse-wheel zoom, touch pinch zoom, and no empty edges
 - deterministic, local builder-title suggestions based on role keywords
-- a true 1080 × 1350 PNG export rendered with the Canvas API
+- a true 850 × 1350 slim portrait PNG export rendered with the Canvas API
 - local Blob download and Web Share API file sharing
 - public LinkedIn/X share links backed by Supabase Storage and `generated_frames`
 - dynamic `/frame/[shareId]` Open Graph and X card metadata using the generated card itself
@@ -94,7 +94,7 @@ npm start
 | Portrait / landscape | Drag to every crop boundary, zoom with the slider/wheel/pinch, and confirm no blank canvas area appears. |
 | Corrupt/oversized file | Confirm a descriptive inline error and that the previous valid photo remains usable. |
 | Mobile | Test iPhone Safari and Android Chrome at narrow widths; verify one-handed touch targets, pinch crop, no horizontal overflow, and keyboard-safe fields. |
-| Download | Inspect the downloaded file dimensions (1080 × 1350), PNG type, sanitized filename, sharp text, and matching crop. |
+| Download | Inspect the downloaded file dimensions (850 × 1350), PNG type, sanitized filename, sharp text, and matching crop. |
 | Native sharing | On a supporting mobile browser, confirm the share sheet receives the image file and the caption contains exactly `#FrameInGoa`; cancel once to verify graceful recovery. |
 | LinkedIn / X | Confirm the public-upload notice appears first, only the final PNG reaches Storage, and a blocked popup produces a usable fallback. |
 | Public frame route | Open the generated `/frame/{shareId}` URL in a signed-out window and use **Create your own** to return to the generator. |

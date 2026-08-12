@@ -441,11 +441,11 @@ export function GeneratorExperience() {
           <div className="mx-auto max-w-7xl">
             <div className="mb-10 grid gap-7 lg:grid-cols-[1fr_auto] lg:items-end">
               <div>
-                <span className="font-mono-hh text-xs font-black uppercase tracking-[0.18em] text-[#fee101]">Format B · Builder Card</span>
+                <span className="font-mono-hh text-xs font-black uppercase tracking-[0.18em] text-[#fee101]">Credential 01 · Builder ID</span>
                 <h2 id="generator-title" className="mt-3 max-w-3xl font-display text-4xl leading-[0.92] tracking-[-0.045em] text-white sm:text-6xl">
                   One pass. Fully yours.
                 </h2>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-white/68">Upload, frame, add your builder identity, and render a social-ready 4:5 graphic.</p>
+                <p className="mt-4 max-w-2xl text-base leading-7 text-white/68">Upload, frame, add your builder identity, and render a slim event credential.</p>
               </div>
               <div className="flex items-center gap-3 rounded-full border border-white/12 bg-white/[0.06] px-4 py-3 text-xs font-semibold text-white/65">
                 <LockKeyhole className="size-4 text-[#b7f43b]" aria-hidden="true" />
@@ -462,7 +462,7 @@ export function GeneratorExperience() {
               ))}
             </ol>
 
-            <div className="grid items-start gap-8 lg:grid-cols-[minmax(20rem,28rem)_minmax(0,1fr)] lg:gap-12">
+            <div className="grid items-start gap-8 lg:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)] lg:gap-12">
               <aside className="sticky top-6 hidden lg:block">
                 <CardPreview
                   builderTitle={selectedTitle}
@@ -525,7 +525,7 @@ export function GeneratorExperience() {
 
                 <div className="border-b border-[#006b3c]/12 p-5 lg:hidden sm:p-7">
                   <p className="mb-5 text-center font-mono-hh text-[10px] font-black uppercase tracking-[0.16em] text-[#003c24]/55">Your live layout</p>
-                  <div className="mx-auto max-w-72">
+                  <div className="mx-auto max-w-64">
                     <CardPreview
                       builderTitle={selectedTitle}
                       imageHeight={decodedImage?.height ?? null}

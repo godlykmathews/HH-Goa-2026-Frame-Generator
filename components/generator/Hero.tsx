@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowDown, LockKeyhole, Sparkles } from "lucide-react";
+import { ArrowDown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 interface HeroProps {
@@ -32,10 +32,6 @@ export function Hero({ onStart }: HeroProps) {
             priority
           />
         </a>
-        <div className="hidden items-center gap-2 text-right font-mono-hh text-[11px] uppercase tracking-[0.18em] text-white/70 sm:flex">
-          <LockKeyhole className="size-4 text-[#fee101]" aria-hidden="true" />
-          Photo stays on this device
-        </div>
       </nav>
 
       <div className="mx-auto mt-16 grid max-w-7xl items-end gap-12 sm:mt-24 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -45,11 +41,11 @@ export function Hero({ onStart }: HeroProps) {
             Hacker House · Goa · 28—31 Oct
           </div>
           <h1 className="max-w-5xl font-display text-[clamp(3.4rem,13vw,9.5rem)] leading-[0.78] tracking-[-0.075em] text-[#fee101]">
-            BUILD YOUR
+            MAKE IT
             <span className="block font-editorial italic tracking-[-0.06em] text-white">Goa identity.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-balance text-base leading-7 text-white/78 sm:text-lg">
-            Turn one photo into a bold HH Goa 2026 builder graphic—ready to download, post, and take over the timeline.
+            Turn one photo into a sharp HH Goa 2026 builder credential—ready to download, wear, and share.
           </p>
           <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             <Button size="large" onClick={onStart}>

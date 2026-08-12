@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BUILDER_CARD_FORMAT } from "@/lib/canvas/renderBuilderCard";
 import { lookupGeneratedFrame } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -40,8 +41,8 @@ export async function generateMetadata({
       images: [
         {
           url: result.frame.image_url,
-          width: 1080,
-          height: 1350,
+          width: BUILDER_CARD_FORMAT.width,
+          height: BUILDER_CARD_FORMAT.height,
           alt: "A personalized HH Goa 2026 builder card",
         },
       ],
@@ -125,8 +126,8 @@ export default async function FramePage({ params }: FramePageProps) {
         </span>
       </nav>
 
-      <section className="relative mx-auto mt-8 grid w-full max-w-6xl items-center gap-9 pb-12 lg:mt-12 lg:grid-cols-[minmax(0,620px)_minmax(270px,1fr)] lg:gap-16">
-        <div className="relative mx-auto w-full max-w-[620px]">
+      <section className="relative mx-auto mt-8 grid w-full max-w-6xl items-center gap-9 pb-12 lg:mt-12 lg:grid-cols-[minmax(0,440px)_minmax(270px,1fr)] lg:gap-16">
+        <div className="relative mx-auto w-full max-w-[420px]">
           <div className="absolute -inset-2 -rotate-1 rounded-[1.8rem] bg-[#fee101] shadow-[0_24px_90px_rgba(0,0,0,0.3)]" />
           <div className="absolute -inset-2 rotate-1 rounded-[1.8rem] border-[3px] border-[#ff1684]" />
           <figure className="relative overflow-hidden rounded-[1.35rem] border border-white/20 bg-[#002c1c]">
@@ -134,10 +135,10 @@ export default async function FramePage({ params }: FramePageProps) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={result.frame.image_url}
-              width="1080"
-              height="1350"
+              width={BUILDER_CARD_FORMAT.width}
+              height={BUILDER_CARD_FORMAT.height}
               alt="Personalized HH Goa 2026 builder card"
-              className="block aspect-[4/5] h-auto w-full object-cover"
+              className="block h-auto w-full object-contain"
               fetchPriority="high"
             />
           </figure>

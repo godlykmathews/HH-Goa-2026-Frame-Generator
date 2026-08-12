@@ -4,6 +4,7 @@ import type {
   FrameFormatConfig,
   ImageTransform,
 } from "@/types";
+import { createBuilderCredentialCode } from "@/lib/builderCredential";
 
 const COLORS = {
   emerald: "#064d34",
@@ -33,15 +34,15 @@ export const FRAME_FORMATS = {
   "builder-card": {
     id: "builder-card",
     label: "Builder ID Card",
-    width: 1080,
+    width: 850,
     height: 1350,
     mimeType: "image/png",
     fileExtension: "png",
     photoViewport: {
-      x: 72,
-      y: 250,
-      width: 936,
-      height: 702,
+      x: 52,
+      y: 238,
+      width: 475,
+      height: 570,
     },
     minZoom: 1,
     maxZoom: 4,
@@ -341,12 +342,20 @@ function drawImageContained(
 
 function drawCheckerStrip(
   context: CanvasRenderingContext2D,
+  startX: number,
   y: number,
+  width: number,
   height: number,
 ): void {
-  const cellWidth = 24;
+  const cellWidth = 18;
 
-  for (let x = 0, index = 0; x < BUILDER_CARD_FORMAT.width; x += cellWidth, index += 1) {
+  context.save();
+  context.beginPath();
+  context.rect(startX, y, width, height);
+  context.clip();
+
+  for (let offset = 0, index = 0; offset < width; offset += cellWidth, index += 1) {
+    const x = startX + offset;
     context.fillStyle = index % 2 === 0 ? COLORS.yellow : COLORS.pink;
     context.fillRect(x, y, cellWidth, height);
 
@@ -358,22 +367,24 @@ function drawCheckerStrip(
     context.closePath();
     context.fill();
   }
+
+  context.restore();
 }
 
 function drawTechnicalGrid(context: CanvasRenderingContext2D): void {
   context.save();
-  context.globalAlpha = 0.09;
+  context.globalAlpha = 0.075;
   context.strokeStyle = COLORS.cream;
   context.lineWidth = 1;
 
-  for (let x = 18; x < BUILDER_CARD_FORMAT.width; x += 54) {
+  for (let x = 18; x < BUILDER_CARD_FORMAT.width; x += 34) {
     context.beginPath();
     context.moveTo(x, 0);
     context.lineTo(x, BUILDER_CARD_FORMAT.height);
     context.stroke();
   }
 
-  for (let y = 18; y < BUILDER_CARD_FORMAT.height; y += 54) {
+  for (let y = 18; y < BUILDER_CARD_FORMAT.height; y += 34) {
     context.beginPath();
     context.moveTo(0, y);
     context.lineTo(BUILDER_CARD_FORMAT.width, y);
@@ -381,10 +392,10 @@ function drawTechnicalGrid(context: CanvasRenderingContext2D): void {
   }
 
   context.fillStyle = COLORS.yellow;
-  for (let x = 45; x < BUILDER_CARD_FORMAT.width; x += 162) {
-    for (let y = 45; y < BUILDER_CARD_FORMAT.height; y += 162) {
+  for (let x = 52; x < BUILDER_CARD_FORMAT.width; x += 136) {
+    for (let y = 52; y < BUILDER_CARD_FORMAT.height; y += 136) {
       context.beginPath();
-      context.arc(x, y, 3, 0, Math.PI * 2);
+      context.arc(x, y, 2.2, 0, Math.PI * 2);
       context.fill();
     }
   }
@@ -394,19 +405,19 @@ function drawTechnicalGrid(context: CanvasRenderingContext2D): void {
 
 function drawFallbackTropicalArt(context: CanvasRenderingContext2D): void {
   context.save();
-  context.globalAlpha = 0.22;
+  context.globalAlpha = 0.18;
   context.fillStyle = COLORS.yellow;
   context.beginPath();
-  context.arc(540, 1120, 155, Math.PI, Math.PI * 2);
+  context.arc(425, 1080, 125, Math.PI, Math.PI * 2);
   context.fill();
 
   context.strokeStyle = COLORS.cream;
-  context.lineWidth = 8;
+  context.lineWidth = 6;
   for (let index = 0; index < 4; index += 1) {
     context.beginPath();
-    context.moveTo(240 + index * 34, 1230 + index * 26);
-    context.bezierCurveTo(370, 1180, 470, 1280, 610, 1228 + index * 26);
-    context.bezierCurveTo(740, 1180, 830, 1280, 930, 1230 + index * 26);
+    context.moveTo(120 + index * 28, 1190 + index * 22);
+    context.bezierCurveTo(260, 1145, 350, 1240, 455, 1188 + index * 22);
+    context.bezierCurveTo(570, 1145, 660, 1235, 760, 1190 + index * 22);
     context.stroke();
   }
   context.restore();
@@ -416,10 +427,10 @@ function drawBackground(
   context: CanvasRenderingContext2D,
   assets: LoadedBrandAssets,
 ): void {
-  const background = context.createLinearGradient(0, 0, 1080, 1350);
+  const background = context.createLinearGradient(0, 0, 850, 1350);
   background.addColorStop(0, COLORS.emeraldDark);
-  background.addColorStop(0.45, COLORS.emerald);
-  background.addColorStop(1, "#07573b");
+  background.addColorStop(0.42, COLORS.emerald);
+  background.addColorStop(1, "#063f2e");
   context.fillStyle = background;
   context.fillRect(0, 0, BUILDER_CARD_FORMAT.width, BUILDER_CARD_FORMAT.height);
 
@@ -427,77 +438,118 @@ function drawBackground(
 
   if (assets.sunrise) {
     context.save();
-    context.globalAlpha = 0.24;
-    context.drawImage(assets.sunrise, 0, 390, 1080, 1078.5);
+    context.globalAlpha = 0.15;
+    context.drawImage(assets.sunrise, 0, 500, 850, 848.8);
     context.restore();
   } else {
     drawFallbackTropicalArt(context);
   }
 
-  const lowerFade = context.createLinearGradient(0, 840, 0, 1350);
+  const lowerFade = context.createLinearGradient(0, 750, 0, 1350);
   lowerFade.addColorStop(0, "rgba(2, 47, 36, 0)");
-  lowerFade.addColorStop(0.28, "rgba(2, 47, 36, 0.72)");
-  lowerFade.addColorStop(1, "rgba(2, 47, 36, 0.92)");
+  lowerFade.addColorStop(0.34, "rgba(2, 47, 36, 0.72)");
+  lowerFade.addColorStop(1, "rgba(2, 47, 36, 0.95)");
   context.fillStyle = lowerFade;
-  context.fillRect(0, 820, 1080, 530);
+  context.fillRect(0, 730, 850, 620);
 
   context.fillStyle = COLORS.pink;
   context.beginPath();
-  context.moveTo(760, 0);
-  context.lineTo(1080, 0);
-  context.lineTo(1080, 58);
-  context.lineTo(810, 58);
+  context.moveTo(636, 22);
+  context.lineTo(828, 22);
+  context.lineTo(828, 92);
+  context.lineTo(690, 92);
   context.closePath();
   context.fill();
 
-  drawCheckerStrip(context, 0, 16);
-  drawCheckerStrip(context, 1334, 16);
+  context.save();
+  context.shadowColor = "rgba(255, 22, 132, 0.28)";
+  context.shadowBlur = 24;
+  context.strokeStyle = COLORS.pink;
+  context.lineWidth = 8;
+  roundedRectanglePath(context, 29, 31, 792, 1294, 34);
+  context.stroke();
+  context.restore();
+
+  context.strokeStyle = "rgba(255, 225, 26, 0.82)";
+  context.lineWidth = 2;
+  roundedRectanglePath(context, 22, 22, 806, 1306, 38);
+  context.stroke();
+
+  drawCheckerStrip(context, 42, 42, 766, 12);
+  drawCheckerStrip(context, 42, 1310, 766, 12);
 }
 
 function drawHeader(context: CanvasRenderingContext2D, assets: LoadedBrandAssets): void {
   context.fillStyle = COLORS.pink;
-  roundedRectanglePath(context, 72, 42, 258, 37, 18.5);
+  roundedRectanglePath(context, 52, 69, 216, 34, 17);
   context.fill();
 
-  setFont(context, 19, 700, MONO_FONT);
+  setFont(context, 15, 700, MONO_FONT);
   context.fillStyle = COLORS.cream;
   context.textBaseline = "middle";
-  context.fillText("HH GOA 2026 // ID", 92, 61);
+  context.fillText("HH // GOA 2026 // ID", 70, 87);
 
   if (assets.hackerHouse) {
-    drawImageContained(context, assets.hackerHouse, 72, 91, 570, 118);
+    drawImageContained(context, assets.hackerHouse, 52, 111, 520, 108);
   } else {
-    setFont(context, 72, 900, DISPLAY_FONT);
+    setFont(context, 57, 900, DISPLAY_FONT);
     context.textBaseline = "alphabetic";
     context.fillStyle = COLORS.yellow;
-    context.fillText("HACKER HOUSE", 72, 174);
+    context.fillText("HACKER HOUSE", 52, 190);
   }
 
   context.textAlign = "right";
-  context.textBaseline = "alphabetic";
-  setFont(context, 20, 700, MONO_FONT);
+  context.textBaseline = "middle";
+  setFont(context, 12, 700, MONO_FONT);
   context.fillStyle = COLORS.cream;
-  context.fillText("GOA, INDIA", 826, 73);
-  context.fillStyle = COLORS.yellow;
-  context.fillText("28—31 OCT", 826, 104);
-  context.fillStyle = COLORS.cream;
-  context.fillText("BUILD. SHIP. REPEAT.", 826, 135);
+  context.fillText("ISSUE // 26", 798, 78);
 
   if (assets.goaHindi) {
-    drawImageContained(context, assets.goaHindi, 850, 67, 158, 152);
+    drawImageContained(context, assets.goaHindi, 684, 94, 114, 116);
   } else {
     context.fillStyle = COLORS.yellow;
     context.beginPath();
-    context.arc(931, 143, 63, 0, Math.PI * 2);
+    context.arc(741, 151, 51, 0, Math.PI * 2);
     context.fill();
-    setFont(context, 30, 900, DISPLAY_FONT);
+    setFont(context, 25, 900, DISPLAY_FONT);
     context.fillStyle = COLORS.pink;
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillText("GOA", 931, 143);
+    context.fillText("GOA", 741, 151);
   }
 
   context.textAlign = "left";
+}
+
+function drawDataBars(
+  context: CanvasRenderingContext2D,
+  value: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): void {
+  let seed = 0;
+  for (const character of value) seed = (seed * 31 + (character.codePointAt(0) ?? 0)) >>> 0;
+
+  context.save();
+  context.beginPath();
+  context.rect(x, y, width, height);
+  context.clip();
+  context.fillStyle = "rgba(247, 241, 223, 0.1)";
+  context.fillRect(x, y, width, height);
+
+  let cursor = x + 6;
+  const end = x + width - 6;
+  while (cursor < end) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const barWidth = 2 + ((seed >>> 28) % 4) * 2;
+    const inset = (seed >>> 24) % 8;
+    context.fillStyle = seed % 5 === 0 ? COLORS.pink : COLORS.cream;
+    context.fillRect(cursor, y + inset, Math.min(barWidth, end - cursor), height - inset * 2);
+    cursor += barWidth + 3 + ((seed >>> 20) % 3);
+  }
+  context.restore();
 }
 
 function drawPhoto(
@@ -527,48 +579,123 @@ function drawPhoto(
   context.save();
   roundedRectanglePath(context, viewport.x, viewport.y, viewport.width, viewport.height, 30);
   context.clip();
-  const photoFade = context.createLinearGradient(0, viewport.y + 440, 0, viewport.y + viewport.height);
+  const photoFade = context.createLinearGradient(0, viewport.y + 340, 0, viewport.y + viewport.height);
   photoFade.addColorStop(0, "rgba(2, 47, 36, 0)");
-  photoFade.addColorStop(1, "rgba(2, 47, 36, 0.72)");
+  photoFade.addColorStop(1, "rgba(2, 47, 36, 0.68)");
   context.fillStyle = photoFade;
-  context.fillRect(viewport.x, viewport.y + 400, viewport.width, viewport.height - 400);
+  context.fillRect(viewport.x, viewport.y + 320, viewport.width, viewport.height - 320);
   context.restore();
 
   context.save();
   roundedRectanglePath(context, viewport.x, viewport.y, viewport.width, viewport.height, 30);
   context.strokeStyle = COLORS.pink;
-  context.lineWidth = 16;
+  context.lineWidth = 7;
   context.stroke();
   context.strokeStyle = COLORS.yellow;
-  context.lineWidth = 5;
+  context.lineWidth = 2;
   context.stroke();
   context.restore();
 
   context.fillStyle = COLORS.yellow;
-  roundedRectanglePath(context, 103, 871, 222, 47, 23.5);
+  roundedRectanglePath(context, 72, 746, 202, 42, 21);
   context.fill();
-  setFont(context, 20, 800, MONO_FONT);
+  setFont(context, 15, 800, MONO_FONT);
   context.fillStyle = COLORS.ink;
   context.textBaseline = "middle";
-  context.fillText("BUILD MODE: ON", 126, 895);
+  context.fillText("BUILD MODE // ON", 91, 768);
 
   context.textAlign = "right";
   context.fillStyle = COLORS.cream;
-  setFont(context, 18, 700, MONO_FONT);
-  context.fillText("FORMAT B // 4:5", 973, 895);
+  setFont(context, 12, 700, MONO_FONT);
+  context.fillText("PORTRAIT // LIVE", 504, 769);
   context.textAlign = "left";
 
-  const bracketSize = 28;
+  const bracketSize = 25;
+  const bracketInset = 19;
   context.strokeStyle = COLORS.cream;
-  context.lineWidth = 5;
+  context.lineWidth = 3;
   context.beginPath();
-  context.moveTo(94, 288 + bracketSize);
-  context.lineTo(94, 288);
-  context.lineTo(94 + bracketSize, 288);
-  context.moveTo(986 - bracketSize, 288);
-  context.lineTo(986, 288);
-  context.lineTo(986, 288 + bracketSize);
+  context.moveTo(viewport.x + bracketInset, viewport.y + bracketInset + bracketSize);
+  context.lineTo(viewport.x + bracketInset, viewport.y + bracketInset);
+  context.lineTo(viewport.x + bracketInset + bracketSize, viewport.y + bracketInset);
+  context.moveTo(viewport.x + viewport.width - bracketInset - bracketSize, viewport.y + bracketInset);
+  context.lineTo(viewport.x + viewport.width - bracketInset, viewport.y + bracketInset);
+  context.lineTo(viewport.x + viewport.width - bracketInset, viewport.y + bracketInset + bracketSize);
   context.stroke();
+}
+
+function drawCredentialRail(
+  context: CanvasRenderingContext2D,
+  input: BuilderCardRenderInput,
+): void {
+  const rail = { x: 545, y: 238, width: 253, height: 570 };
+  const code = createBuilderCredentialCode(input.name, input.role);
+
+  context.save();
+  context.shadowColor = "rgba(0, 0, 0, 0.24)";
+  context.shadowBlur = 22;
+  context.shadowOffsetY = 12;
+  context.fillStyle = "rgba(0, 44, 28, 0.92)";
+  roundedRectanglePath(context, rail.x, rail.y, rail.width, rail.height, 24);
+  context.fill();
+  context.restore();
+
+  context.strokeStyle = "rgba(255, 225, 26, 0.36)";
+  context.lineWidth = 2;
+  roundedRectanglePath(context, rail.x, rail.y, rail.width, rail.height, 24);
+  context.stroke();
+
+  context.fillStyle = COLORS.pink;
+  context.beginPath();
+  context.moveTo(rail.x + 181, rail.y);
+  context.lineTo(rail.x + rail.width, rail.y);
+  context.lineTo(rail.x + rail.width, rail.y + 63);
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = COLORS.yellow;
+  context.fillRect(rail.x + 12, rail.y + 24, 3, rail.height - 48);
+
+  setFont(context, 12, 700, MONO_FONT);
+  context.fillStyle = COLORS.yellow;
+  context.textBaseline = "alphabetic";
+  context.fillText("CREDENTIAL / LIVE", 568, 273);
+
+  context.fillStyle = COLORS.pink;
+  context.beginPath();
+  context.arc(572, 304, 6, 0, Math.PI * 2);
+  context.fill();
+  setFont(context, 16, 800, MONO_FONT);
+  context.fillStyle = COLORS.cream;
+  context.fillText("ACTIVE", 588, 309);
+
+  context.strokeStyle = "rgba(247, 241, 223, 0.18)";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(568, 330);
+  context.lineTo(776, 330);
+  context.stroke();
+
+  const drawField = (label: string, value: string, labelY: number, highlight = false) => {
+    setFont(context, 11, 700, MONO_FONT);
+    context.fillStyle = COLORS.pink;
+    context.fillText(label, 568, labelY);
+    const fitted = fitSingleLineText(context, value, 208, 20, 15, 800, MONO_FONT);
+    setFont(context, fitted.fontSize, 800, MONO_FONT);
+    context.fillStyle = highlight ? COLORS.yellow : COLORS.cream;
+    context.fillText(fitted.text, 568, labelY + 29);
+  };
+
+  drawField("BUILDER ID", code, 370);
+  drawField("LOCATION", "GOA, INDIA", 441);
+  drawField("EVENT WINDOW", "28—31 OCT", 512);
+  drawField("ACCESS", "ALL BUILD ZONES", 583);
+  drawField("CLASS", "BUILDER", 654, true);
+
+  drawDataBars(context, code, 568, 724, 208, 43);
+  setFont(context, 10, 700, MONO_FONT);
+  context.fillStyle = "rgba(247, 241, 223, 0.62)";
+  context.fillText("ACCESS KEY // HH26", 568, 790);
 }
 
 function drawDetails(context: CanvasRenderingContext2D, input: BuilderCardRenderInput): void {
@@ -576,75 +703,93 @@ function drawDetails(context: CanvasRenderingContext2D, input: BuilderCardRender
   const displayName = name.toLocaleUpperCase("en-US");
   const builderTitle = cleanText(input.builderTitle) || "Systems Builder";
   const role = cleanText(input.role) || "Product Builder";
+  const code = createBuilderCredentialCode(input.name, input.role);
 
   context.textBaseline = "alphabetic";
-  setFont(context, 21, 700, MONO_FONT);
+  setFont(context, 15, 700, MONO_FONT);
   context.fillStyle = COLORS.pink;
-  context.fillText("BUILDER // IDENTIFIED", 72, 1008);
+  context.fillText("BUILDER // IDENTIFIED", 52, 851);
 
   context.textAlign = "right";
   context.fillStyle = COLORS.yellow;
-  context.fillText("#FrameInGoa", 1008, 1008);
-  context.fillStyle = "rgba(247, 241, 223, 0.7)";
-  setFont(context, 16, 700, MONO_FONT);
-  context.fillText("HH26 / ONE OF ONE", 1008, 1040);
+  context.fillText("ONE OF ONE // VERIFIED", 798, 851);
   context.textAlign = "left";
+
+  context.strokeStyle = "rgba(247, 241, 223, 0.18)";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(52, 867);
+  context.lineTo(798, 867);
+  context.stroke();
 
   const fittedName = fitSingleLineText(
     context,
     displayName,
-    936,
-    82,
-    46,
+    746,
+    78,
+    38,
     900,
     DISPLAY_FONT,
   );
   setFont(context, fittedName.fontSize, 900, DISPLAY_FONT);
   context.fillStyle = COLORS.cream;
-  context.fillText(fittedName.text, 72, 1092);
+  context.fillText(fittedName.text, 52, 953);
 
   const fittedTitle = fitSingleLineText(
     context,
     builderTitle,
-    648,
-    38,
-    27,
+    682,
+    35,
+    22,
     900,
     DISPLAY_FONT,
   );
   setFont(context, fittedTitle.fontSize, 900, DISPLAY_FONT);
-  const titleTextWidth = context.measureText(fittedTitle.text).width;
-  const pillWidth = Math.min(710, Math.max(285, titleTextWidth + 64));
 
   context.fillStyle = COLORS.pink;
-  roundedRectanglePath(context, 72, 1118, pillWidth, 81, 15);
+  roundedRectanglePath(context, 52, 976, 746, 76, 13);
   context.fill();
   context.strokeStyle = COLORS.yellow;
-  context.lineWidth = 3;
-  roundedRectanglePath(context, 78, 1124, pillWidth - 12, 69, 11);
+  context.lineWidth = 2;
+  roundedRectanglePath(context, 58, 982, 734, 64, 9);
   context.stroke();
   context.fillStyle = COLORS.cream;
   context.textBaseline = "middle";
-  context.fillText(fittedTitle.text, 103, 1159.5);
+  context.fillText(fittedTitle.text, 82, 1014);
 
   context.textBaseline = "alphabetic";
-  setFont(context, 17, 700, MONO_FONT);
+  setFont(context, 12, 700, MONO_FONT);
   context.fillStyle = COLORS.pink;
-  context.fillText("STACK / ROLE", 72, 1239);
+  context.fillText("STACK / ROLE", 52, 1094);
 
-  setFont(context, 33, 800, BODY_FONT);
+  setFont(context, 30, 800, BODY_FONT);
   context.fillStyle = COLORS.yellow;
-  const roleLines = wrapCanvasText(context, role, 936, 2);
+  const roleLines = wrapCanvasText(context, role, 746, 2);
   roleLines.forEach((line, index) => {
-    context.fillText(line, 72, 1280 + index * 38);
+    context.fillText(line, 52, 1137 + index * 37);
   });
 
   context.strokeStyle = "rgba(247, 241, 223, 0.22)";
-  context.lineWidth = 2;
+  context.lineWidth = 1;
   context.beginPath();
-  context.moveTo(72, 1213);
-  context.lineTo(1008, 1213);
+  context.moveTo(52, 1205);
+  context.lineTo(798, 1205);
   context.stroke();
+
+  setFont(context, 14, 800, MONO_FONT);
+  context.fillStyle = COLORS.yellow;
+  context.fillText("#FRAMEINGOA", 52, 1240);
+  context.textAlign = "right";
+  context.fillStyle = COLORS.cream;
+  context.fillText(code, 798, 1240);
+  context.textAlign = "left";
+
+  drawDataBars(context, code, 52, 1261, 456, 29);
+  setFont(context, 11, 700, MONO_FONT);
+  context.fillStyle = "rgba(247, 241, 223, 0.68)";
+  context.textAlign = "right";
+  context.fillText("BUILD / SHIP / REPEAT", 798, 1282);
+  context.textAlign = "left";
 }
 
 function paintBuilderCard(
@@ -655,6 +800,7 @@ function paintBuilderCard(
   drawBackground(context, assets);
   drawHeader(context, assets);
   drawPhoto(context, input);
+  drawCredentialRail(context, input);
   drawDetails(context, input);
 }
 
@@ -707,9 +853,9 @@ async function waitForCanvasFonts(): Promise<void> {
   const fontsReady = (async () => {
     try {
       await Promise.all([
-        document.fonts.load(`900 82px ${DISPLAY_FONT}`),
-        document.fonts.load(`800 33px ${BODY_FONT}`),
-        document.fonts.load(`700 21px ${MONO_FONT}`),
+        document.fonts.load(`900 78px ${DISPLAY_FONT}`),
+        document.fonts.load(`800 30px ${BODY_FONT}`),
+        document.fonts.load(`700 20px ${MONO_FONT}`),
       ]);
       await document.fonts.ready;
     } catch {

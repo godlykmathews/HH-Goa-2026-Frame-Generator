@@ -4,6 +4,7 @@
 
 import { AlertCircle, CheckCircle2, Download, ExternalLink, Link, RefreshCw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { BUILDER_CARD_FORMAT } from "@/lib/canvas/renderBuilderCard";
 
 export type PublicShareTarget = "x" | "linkedin";
 
@@ -46,7 +47,7 @@ export function ResultPanel({
   const sharingPublicly = sharingTarget === "x" || sharingTarget === "linkedin";
 
   return (
-    <section id="result" aria-labelledby="result-title" className="border-t border-[#fee101]/25 px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <section id="result" aria-labelledby="result-title" className="overflow-x-clip border-t border-[#fee101]/25 px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 max-w-3xl">
           <span className="inline-flex items-center gap-2 rounded-full bg-[#fee101] px-3 py-1.5 font-mono-hh text-[10px] font-black uppercase tracking-[0.15em] text-[#003c24]">
@@ -59,17 +60,23 @@ export function ResultPanel({
           <p className="mt-4 text-white/68">Download it privately, share the image from your phone, or create a public preview link for X and LinkedIn.</p>
         </div>
 
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,34rem)_minmax(22rem,1fr)] lg:gap-14">
-          <figure>
-            <div className="overflow-hidden rounded-[1.75rem] border-2 border-[#fee101]/60 bg-[#003c24] p-2 shadow-[10px_10px_0_#ff1684] sm:p-3">
-              <img src={imageUrl} alt="Your completed HH Goa 2026 builder card" className="aspect-[4/5] w-full rounded-[1.2rem] object-cover" />
+        <div className="grid min-w-0 items-start gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(22rem,1fr)] lg:gap-14">
+          <figure className="mx-auto min-w-0 w-[calc(100%-0.75rem)] max-w-[21rem] sm:w-full sm:max-w-[24rem] lg:mx-0">
+            <div className="w-full overflow-hidden rounded-[1.5rem] border-2 border-[#fee101]/60 bg-[#003c24] p-2 shadow-[6px_6px_0_#ff1684] sm:rounded-[1.75rem] sm:p-3 sm:shadow-[10px_10px_0_#ff1684]">
+              <img
+                src={imageUrl}
+                width={BUILDER_CARD_FORMAT.width}
+                height={BUILDER_CARD_FORMAT.height}
+                alt="Your completed HH Goa 2026 builder credential"
+                className="block h-auto w-full max-w-full rounded-[1.1rem] object-contain sm:rounded-[1.2rem]"
+              />
             </div>
             <figcaption className="mt-4 truncate text-center font-mono-hh text-[10px] uppercase tracking-[0.13em] text-white/50">
-              {fileName} · 1080 × 1350 PNG
+              {fileName} · {BUILDER_CARD_FORMAT.width} × {BUILDER_CARD_FORMAT.height} PNG
             </figcaption>
           </figure>
 
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <div className="rounded-2xl bg-[#fff9dc] p-5 text-[#003c24] sm:p-6">
               <h3 className="font-display text-xl tracking-[-0.025em]">Keep it local</h3>
               <p className="mt-1 text-sm leading-6 text-[#003c24]/65">These actions never upload your card.</p>

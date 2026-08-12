@@ -11,6 +11,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
 } from "react";
+import { BUILDER_CARD_FORMAT } from "@/lib/canvas/renderBuilderCard";
 import type { ImageTransform } from "@/types";
 
 interface PhotoEditorProps {
@@ -144,7 +145,7 @@ export function PhotoEditor({ imageHeight, imageWidth, previewUrl, transform, on
   const nudge = (x: number, y: number) => moveByPixels(x * 18, y * 18);
 
   return (
-    <div>
+    <div className="min-w-0 w-full lg:mx-auto lg:max-w-[24rem] xl:max-w-[26rem]">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-center gap-2 text-sm font-bold text-[#003c24]">
           <Move className="size-4 text-[#ff1684]" aria-hidden="true" />
@@ -186,7 +187,10 @@ export function PhotoEditor({ imageHeight, imageWidth, previewUrl, transform, on
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
-        className="relative aspect-[4/3] w-full touch-none cursor-grab overflow-hidden rounded-2xl bg-[#003c24] shadow-[inset_0_0_0_2px_rgba(254,225,1,.4)] active:cursor-grabbing"
+        className="relative w-full touch-none cursor-grab overflow-hidden rounded-2xl bg-[#003c24] shadow-[inset_0_0_0_2px_rgba(254,225,1,.4)] active:cursor-grabbing"
+        style={{
+          aspectRatio: `${BUILDER_CARD_FORMAT.photoViewport.width} / ${BUILDER_CARD_FORMAT.photoViewport.height}`,
+        }}
       >
         <img
           src={previewUrl}
@@ -227,7 +231,7 @@ export function PhotoEditor({ imageHeight, imageWidth, previewUrl, transform, on
           step="0.01"
           value={transform.zoom}
           onChange={(event) => setZoom(Number(event.currentTarget.value))}
-          className="h-2 w-full accent-[#ff1684]"
+          className="h-2 min-w-0 flex-1 accent-[#ff1684]"
         />
         <button
           type="button"
@@ -238,7 +242,7 @@ export function PhotoEditor({ imageHeight, imageWidth, previewUrl, transform, on
         >
           <Plus className="size-5" aria-hidden="true" />
         </button>
-        <output htmlFor="photo-zoom" className="w-12 text-right font-mono-hh text-xs font-bold text-[#003c24]/65">
+        <output htmlFor="photo-zoom" className="w-10 shrink-0 text-right font-mono-hh text-xs font-bold text-[#003c24]/65 sm:w-12">
           {Math.round(transform.zoom * 100)}%
         </output>
       </div>

@@ -2,6 +2,7 @@
 
 import { LockKeyhole, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { BUILDER_CARD_FORMAT } from "@/lib/canvas/renderBuilderCard";
 
 interface GeneratorControlsProps {
   disabled: boolean;
@@ -14,7 +15,7 @@ export function GeneratorControls({ disabled, loading, onGenerate }: GeneratorCo
     <div className="rounded-2xl bg-[#003c24] p-4 sm:p-5">
       <Button className="w-full" size="large" loading={loading} disabled={disabled} onClick={onGenerate}>
         {!loading ? <WandSparkles className="size-5" aria-hidden="true" /> : null}
-        {loading ? "Rendering 1080 × 1350…" : "Generate my card"}
+        {loading ? `Rendering ${BUILDER_CARD_FORMAT.width} × ${BUILDER_CARD_FORMAT.height}…` : "Generate my card"}
       </Button>
       <p className="mt-4 flex items-start justify-center gap-2 text-center text-xs leading-5 text-white/65">
         <LockKeyhole className="mt-0.5 size-3.5 shrink-0 text-[#fee101]" aria-hidden="true" />

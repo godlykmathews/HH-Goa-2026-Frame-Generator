@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   keywords: ["Hacker House", "Goa", "HH Goa 2026", "builder", "frame generator"],
   openGraph: {
     title: "HH Goa 2026 Frame Generator",
-    description: "Build your Goa identity. Make a social-ready HH Goa 2026 builder card.",
+    description: "Build your Goa identity. Make a slim HH Goa 2026 builder credential.",
     type: "website",
     siteName: "HH Goa 2026",
   },
