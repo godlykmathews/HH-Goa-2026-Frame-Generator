@@ -38,7 +38,7 @@ export function buildXShareCaption(options: ShareToXOptions): string {
     "Create your HH Goa builder card:",
     shareUrl,
     "",
-    "#FrameInGoa",
+    "#FrameInGoa #HHGoa2026",
   ].join("\n");
 }
 
