@@ -19,6 +19,7 @@ interface ResultPanelProps {
   fileName: string;
   imageUrl: string;
   manualShareLink: ManualShareLink | null;
+  publicSharePreparing: boolean;
   publicShareUrl: string | null;
   sharingTarget: "native" | PublicShareTarget | null;
   status: string | null;
@@ -35,6 +36,7 @@ export function ResultPanel({
   fileName,
   imageUrl,
   manualShareLink,
+  publicSharePreparing,
   publicShareUrl,
   sharingTarget,
   status,
@@ -117,11 +119,12 @@ export function ResultPanel({
                   id="public-share-consent"
                   type="checkbox"
                   checked={consent}
+                  disabled={publicSharePreparing}
                   onChange={(event) => onConsentChange(event.currentTarget.checked)}
-                  className="mt-0.5 size-5 shrink-0 accent-[#ff1684]"
+                  className="mt-0.5 size-5 shrink-0 accent-[#ff1684] disabled:cursor-wait disabled:opacity-60"
                 />
                 <span>
-                  I understand that <strong className="text-white">only my finished card</strong> will be uploaded and publicly accessible. My original photo is never uploaded separately.
+                  Create my public preview. When I check this, <strong className="text-white">only my finished card</strong> will be uploaded and publicly accessible. My original photo is never uploaded separately.
                 </span>
               </label>
 
@@ -130,7 +133,7 @@ export function ResultPanel({
                   variant="pink"
                   className="w-full"
                   loading={sharingTarget === "x"}
-                  disabled={sharingTarget !== null && sharingTarget !== "x"}
+                  disabled={!consent || !publicShareUrl || publicSharePreparing || (sharingTarget !== null && sharingTarget !== "x")}
                   onClick={() => onPublicShare("x")}
                 >
                   {sharingTarget !== "x" ? <span className="text-lg" aria-hidden="true">𝕏</span> : null}
@@ -140,7 +143,7 @@ export function ResultPanel({
                   variant="secondary"
                   className="w-full"
                   loading={sharingTarget === "linkedin"}
-                  disabled={sharingTarget !== null && sharingTarget !== "linkedin"}
+                  disabled={!consent || !publicShareUrl || publicSharePreparing || (sharingTarget !== null && sharingTarget !== "linkedin")}
                   onClick={() => onPublicShare("linkedin")}
                 >
                   {sharingTarget !== "linkedin" ? <Link className="size-5" aria-hidden="true" /> : null}

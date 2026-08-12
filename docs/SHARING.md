@@ -2,9 +2,9 @@
 
 Local creation, editing, rendering, and downloading do not contact Supabase.
 The original upload is never passed to the sharing layer. A public upload starts
-only when the user explicitly chooses an action that needs a public URL (X or a
-link-based fallback) and the UI passes the finished 850 × 1350 PNG/JPEG Blob to
-`uploadGeneratedFrame`.
+only when the user explicitly opts in to creating a public preview. The UI then
+passes the finished 850 × 1350 PNG/JPEG Blob to `uploadGeneratedFrame` before
+enabling the X and LinkedIn handoff.
 
 ## Setup
 
@@ -25,11 +25,13 @@ configured Supabase origin and exact bucket path before placing it in metadata.
 ## UI integration
 
 ```ts
+// Start this when the user checks the explicit public-preview opt-in.
 const published = await uploadGeneratedFrame(generatedBlob, {
   origin: window.location.origin,
 });
 
 // published: { shareId, imageUrl, shareUrl }
+// This now runs synchronously inside the later Share to X click.
 openShareToX({ builderTitle, shareUrl: published.shareUrl });
 ```
 

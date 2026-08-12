@@ -1,6 +1,6 @@
 # HH Goa 2026 Frame Generator
 
-A mobile-first, no-account campaign tool for creating 850 × 1350 Hacker House Goa builder credentials in one pass. The uploaded source photo stays in the browser. The app only publishes the finished card when the user explicitly chooses a public-link sharing action.
+A mobile-first, no-account campaign tool for creating 850 × 1350 Hacker House Goa builder credentials in one pass. The uploaded source photo stays in the browser. The app only publishes the finished card when the user explicitly opts in to a public preview for sharing.
 
 ## What is included
 
@@ -60,7 +60,7 @@ Generation, download, and native file sharing are entirely local:
 source photo → browser decode/crop → Canvas PNG Blob → download or native share
 ```
 
-Public-network sharing is opt-in:
+Public-network sharing starts only after the explicit public-preview opt-in:
 
 ```text
 finished PNG Blob only → Supabase Storage → generated_frames record
@@ -96,7 +96,7 @@ npm start
 | Mobile | Test iPhone Safari and Android Chrome at narrow widths; verify one-handed touch targets, pinch crop, no horizontal overflow, and keyboard-safe fields. |
 | Download | Inspect the downloaded file dimensions (850 × 1350), PNG type, sanitized filename, sharp text, and matching crop. |
 | Native sharing | On a supporting mobile browser, confirm the share sheet receives the image file and the caption contains exactly `#FrameInGoa`; cancel once to verify graceful recovery. |
-| LinkedIn / X | Confirm the public-upload notice appears first, only the final PNG reaches Storage, and a blocked popup produces a usable fallback. |
+| LinkedIn / X | Opt in to the public preview; confirm the buttons stay disabled until only the final PNG reaches Storage, then one click opens the selected composer. Verify a blocked popup produces a usable fallback. |
 | Public frame route | Open the generated `/frame/{shareId}` URL in a signed-out window and use **Create your own** to return to the generator. |
 | OG preview | Inspect the public URL with an Open Graph/X card debugger after deployment; verify `og:image` and `twitter:image` equal that share record’s generated image and `twitter:card` is `summary_large_image`. |
 | Supabase outage | Disconnect the network or use invalid credentials; public sharing should fail without affecting local download/native file sharing. |

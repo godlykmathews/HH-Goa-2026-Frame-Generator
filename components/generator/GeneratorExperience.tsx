@@ -24,7 +24,7 @@ import { generateBuilderTitles } from "@/lib/builderTitles";
 import { renderBuilderCard } from "@/lib/canvas/renderBuilderCard";
 import { decodeImage } from "@/lib/image/decodeImage";
 import { shareNative } from "@/lib/sharing/shareNative";
-import { buildXIntentUrl, openShareToX } from "@/lib/sharing/shareToX";
+import { openShareToX } from "@/lib/sharing/shareToX";
 import {
   uploadGeneratedFrame,
   type GeneratedFrameShare,
@@ -93,6 +93,8 @@ export function GeneratorExperience() {
   const decodeRequestRef = useRef(0);
   const contentRevisionRef = useRef(0);
   const shareRequestRef = useRef(0);
+  const publicShareRef = useRef<GeneratedFrameShare | null>(null);
+  const publicSharePromiseRef = useRef<Promise<GeneratedFrameShare> | null>(null);
 
   const [decodedImage, setDecodedImage] = useState<DecodedImage | null>(null);
   const [photoFileName, setPhotoFileName] = useState<string | null>(null);
@@ -112,6 +114,7 @@ export function GeneratorExperience() {
   const [generatedBlob, setGeneratedBlob] = useState<Blob | null>(null);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [publicShare, setPublicShare] = useState<GeneratedFrameShare | null>(null);
+  const [publicSharePreparing, setPublicSharePreparing] = useState(false);
   const [publicConsent, setPublicConsent] = useState(false);
   const [sharingTarget, setSharingTarget] = useState<"native" | PublicShareTarget | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
@@ -135,7 +138,10 @@ export function GeneratorExperience() {
 
   const clearShareState = useCallback(() => {
     shareRequestRef.current += 1;
+    publicShareRef.current = null;
+    publicSharePromiseRef.current = null;
     setPublicShare(null);
+    setPublicSharePreparing(false);
     setPublicConsent(false);
     setSharingTarget(null);
     setShareStatus(null);
@@ -162,7 +168,10 @@ export function GeneratorExperience() {
   useEffect(() => {
     return () => {
       decodeRequestRef.current += 1;
+      contentRevisionRef.current += 1;
       shareRequestRef.current += 1;
+      publicShareRef.current = null;
+      publicSharePromiseRef.current = null;
       releasePhotoResources();
       revokeGeneratedUrl();
     };
@@ -325,30 +334,78 @@ export function GeneratorExperience() {
     setSharingTarget(null);
   };
 
-  const getOrCreatePublicShare = async (): Promise<GeneratedFrameShare> => {
-    if (publicShare) return publicShare;
-    if (!generatedBlob) throw new Error("Generate your card again before sharing.");
-    const share = await uploadGeneratedFrame(generatedBlob, { origin: window.location.origin });
-    setPublicShare(share);
-    return share;
-  };
-
-  const openPreparingWindow = (target: PublicShareTarget): Window | null => {
-    try {
-      const popup = window.open("about:blank", `hh-goa-${target}-share`);
-      if (popup) {
-        popup.opener = null;
-        popup.document.title = "Preparing your HH Goa share…";
-        popup.document.body.style.cssText = "margin:0;display:grid;place-items:center;min-height:100vh;background:#003c24;color:#fee101;font:700 16px system-ui";
-        popup.document.body.textContent = "Preparing your HH Goa share…";
-      }
-      return popup;
-    } catch {
-      return null;
+  const preparePublicShare = useCallback((): Promise<GeneratedFrameShare> => {
+    if (publicShareRef.current) {
+      return Promise.resolve(publicShareRef.current);
     }
+    if (publicSharePromiseRef.current) {
+      return publicSharePromiseRef.current;
+    }
+    if (!generatedBlob) {
+      return Promise.reject(new Error("Generate your card again before sharing."));
+    }
+
+    const revision = contentRevisionRef.current;
+    setPublicSharePreparing(true);
+
+    const request = uploadGeneratedFrame(generatedBlob, { origin: window.location.origin })
+      .then((share) => {
+        if (revision === contentRevisionRef.current) {
+          publicShareRef.current = share;
+          setPublicShare(share);
+        }
+        return share;
+      })
+      .finally(() => {
+        if (publicSharePromiseRef.current === request) {
+          publicSharePromiseRef.current = null;
+          if (revision === contentRevisionRef.current) {
+            setPublicSharePreparing(false);
+          }
+        }
+      });
+
+    publicSharePromiseRef.current = request;
+    return request;
+  }, [generatedBlob]);
+
+  const handlePublicConsentChange = (consent: boolean) => {
+    const requestId = shareRequestRef.current + 1;
+    shareRequestRef.current = requestId;
+    setPublicConsent(consent);
+    setShareError(null);
+    setManualShareLink(null);
+
+    if (!consent) {
+      setShareStatus(null);
+      return;
+    }
+
+    if (publicShareRef.current) {
+      setShareStatus("Public preview ready. Choose where to share it.");
+      return;
+    }
+
+    setShareStatus("Uploading only the finished card and preparing its public preview…");
+    void preparePublicShare()
+      .then((share) => {
+        if (
+          requestId === shareRequestRef.current &&
+          share === publicShareRef.current
+        ) {
+          setShareStatus("Public preview ready. Choose where to share it.");
+        }
+      })
+      .catch((error) => {
+        if (requestId === shareRequestRef.current) {
+          setPublicConsent(false);
+          setShareStatus(null);
+          setShareError(errorMessage(error, "Public sharing failed. Your local download still works."));
+        }
+      });
   };
 
-  const handlePublicShare = async (target: PublicShareTarget) => {
+  const handlePublicShare = (target: PublicShareTarget) => {
     if (!publicConsent) {
       setShareStatus(null);
       setShareError("Confirm the public upload notice before sharing to a social network.");
@@ -357,42 +414,35 @@ export function GeneratorExperience() {
     }
     if (!generatedBlob) return;
 
+    const share = publicShareRef.current;
+    if (!share) {
+      setShareStatus(publicSharePreparing ? "Preparing your public preview…" : null);
+      return;
+    }
+
     const requestId = shareRequestRef.current + 1;
     shareRequestRef.current = requestId;
-    const popup = openPreparingWindow(target);
     setSharingTarget(target);
     setShareError(null);
-    setShareStatus(publicShare ? "Opening your share…" : "Uploading only the finished card and creating its public preview…");
+    setShareStatus("Opening your share…");
     setManualShareLink(null);
 
     try {
-      const share = await getOrCreatePublicShare();
-      if (requestId !== shareRequestRef.current) {
-        popup?.close();
-        return;
-      }
-
       if (target === "x") {
         const options = { builderTitle: selectedTitle, shareUrl: share.shareUrl };
-        const intentUrl = buildXIntentUrl(options);
-
-        if (popup) {
-          popup.location.replace(intentUrl);
-          setShareStatus("X opened with your caption and public card link ready to post.");
+        const result = openShareToX(options);
+        if (result.status === "blocked") {
+          setManualShareLink({ href: result.intentUrl, label: "Open the X composer" });
+          setShareError("Your browser blocked the X popup. Use the link below to continue.");
+          setShareStatus(null);
         } else {
-          const result = openShareToX(options);
-          if (result.status === "blocked") {
-            setManualShareLink({ href: result.intentUrl, label: "Open the X composer" });
-            setShareError("Your browser blocked the X popup. Use the link below to continue.");
-            setShareStatus(null);
-          } else {
-            setShareStatus("X opened with your caption and public card link ready to post.");
-          }
+          setShareStatus("X opened with your caption and public card link ready to post.");
         }
       } else {
         const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(share.shareUrl)}`;
+        const popup = window.open(linkedInUrl, "_blank");
         if (popup) {
-          popup.location.replace(linkedInUrl);
+          popup.opener = null;
           setShareStatus("LinkedIn opened with your public card preview ready to share.");
         } else {
           setManualShareLink({ href: linkedInUrl, label: "Open LinkedIn sharing" });
@@ -401,7 +451,6 @@ export function GeneratorExperience() {
         }
       }
     } catch (error) {
-      popup?.close();
       if (requestId === shareRequestRef.current) {
         setShareStatus(null);
         setShareError(errorMessage(error, "Public sharing failed. Your local download still works."));
@@ -561,12 +610,10 @@ export function GeneratorExperience() {
               imageUrl={generatedUrl}
               manualShareLink={manualShareLink}
               publicShareUrl={publicShare?.shareUrl ?? null}
+              publicSharePreparing={publicSharePreparing}
               sharingTarget={sharingTarget}
               status={shareStatus}
-              onConsentChange={(consent) => {
-                setPublicConsent(consent);
-                setShareError(null);
-              }}
+              onConsentChange={handlePublicConsentChange}
               onDownload={downloadGenerated}
               onNativeShare={handleNativeShare}
               onPublicShare={handlePublicShare}
